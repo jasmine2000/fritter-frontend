@@ -1,6 +1,9 @@
 import type {HydratedDocument, Types} from 'mongoose';
 import type {User} from './model';
 import UserModel from './model';
+import CollectionCollection from '../collection/collection';
+import FollowCollection from '../follow/collection';
+import LikeCollection from '../like/collection';
 
 /**
  * This file contains a class with functionality to interact with users stored
@@ -23,7 +26,8 @@ class UserCollection {
 
     const user = new UserModel({username, password, dateJoined});
     await user.save(); // Saves user to MongoDB
-    return user;
+    await CollectionCollection.create('Likes', user._id);
+    return user.populate(['followers', 'following', 'collections']);
   }
 
   /**
@@ -33,7 +37,7 @@ class UserCollection {
    * @return {Promise<HydratedDocument<User>> | Promise<null>} - The user with the given username, if any
    */
   static async findOneByUserId(userId: Types.ObjectId | string): Promise<HydratedDocument<User>> {
-    return UserModel.findOne({_id: userId});
+    return UserModel.findOne({_id: userId}).populate(['followers', 'following', 'collections']);
   }
 
   /**
@@ -43,7 +47,7 @@ class UserCollection {
    * @return {Promise<HydratedDocument<User>> | Promise<null>} - The user with the given username, if any
    */
   static async findOneByUsername(username: string): Promise<HydratedDocument<User>> {
-    return UserModel.findOne({username: new RegExp(`^${username.trim()}$`, 'i')});
+    return UserModel.findOne({username: new RegExp(`^${username.trim()}$`, 'i')}).populate(['followers', 'following', 'collections']);
   }
 
   /**
@@ -57,7 +61,7 @@ class UserCollection {
     return UserModel.findOne({
       username: new RegExp(`^${username.trim()}$`, 'i'),
       password
-    });
+    }).populate(['followers', 'following', 'collections']);
   }
 
   /**
@@ -78,7 +82,7 @@ class UserCollection {
     }
 
     await user.save();
-    return user;
+    return user.populate(['followers', 'following', 'collections']);
   }
 
   /**
@@ -89,6 +93,9 @@ class UserCollection {
    */
   static async deleteOne(userId: Types.ObjectId | string): Promise<boolean> {
     const user = await UserModel.deleteOne({_id: userId});
+    await FollowCollection.deleteUser(userId);
+    await CollectionCollection.deleteUser(userId);
+    await LikeCollection.deleteUser(userId);
     return user !== null;
   }
 }

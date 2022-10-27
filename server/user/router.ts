@@ -18,7 +18,9 @@ const router = express.Router();
  */
 router.get(
   '/session',
-  [],
+  [
+    userValidator.isUserLoggedIn
+  ],
   async (req: Request, res: Response) => {
     const user = await UserCollection.findOneByUserId(req.session.userId);
     res.status(200).json({

@@ -12,16 +12,20 @@ export type Freet = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
   authorId: Types.ObjectId;
   dateCreated: Date;
+  originalContent: string;
   content: string;
   dateModified: Date;
+  likes?: Types.ObjectId[];
 };
 
 export type PopulatedFreet = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
   authorId: User;
   dateCreated: Date;
+  originalContent: string;
   content: string;
   dateModified: Date;
+  likes?: Types.ObjectId[];
 };
 
 // Mongoose schema definition for interfacing with a MongoDB table
@@ -40,6 +44,11 @@ const FreetSchema = new Schema<Freet>({
     type: Date,
     required: true
   },
+  // The ORIGINAL content of the freet
+  originalContent: {
+    type: String,
+    required: true
+  },
   // The content of the freet
   content: {
     type: String,
@@ -51,6 +60,17 @@ const FreetSchema = new Schema<Freet>({
     required: true
   }
 });
+
+// (virtual-population)
+// Auto-populate a Freet.likes
+FreetSchema.virtual('likes', {
+  ref: 'Like',
+  localField: '_id',
+  foreignField: 'postId'
+});
+
+FreetSchema.set('toObject', {getters: true});
+FreetSchema.set('toJSON', {getters: true});
 
 const FreetModel = model<Freet>('Freet', FreetSchema);
 export default FreetModel;
