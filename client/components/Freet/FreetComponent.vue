@@ -7,7 +7,12 @@
   >
     <header>
       <h3 class="author">
-        @{{ freet.author }}
+        <router-link 
+          v-if="$store.state.username"
+          :to="'/profile/'+ freet.author"
+        >
+          @{{ freet.author }}
+        </router-link>
       </h3>
       <div
         v-if="$store.state.username === freet.author"
@@ -44,9 +49,9 @@
     />
     <p
       v-if="editing"
-      :class="characterCount <= 10 ? {color:goodColor} : {color:badColor}"
+      :class="characterCount <= 10 ? 'goodColor' : 'badColor'"
     >
-      {{ characterCount }} / 10 edits made
+      {{ characterCount }} / 10 allowed edits made
     </p>
     <p
       v-else
@@ -85,8 +90,6 @@ export default {
       editing: false, // Whether or not this freet is in edit mode
       draft: this.freet.content, // Potentially-new content for this freet
       alerts: {}, // Displays success/error messages encountered during freet modification
-      goodColor: 'green',
-      badColor: 'red'
     };
   },
   computed: {
@@ -216,5 +219,13 @@ export default {
     border: 1px solid #111;
     padding: 20px;
     position: relative;
+}
+
+.goodColor {
+  color: green
+}
+
+.badColor {
+  color: red
 }
 </style>
