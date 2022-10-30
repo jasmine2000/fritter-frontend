@@ -32,6 +32,23 @@ const collectionNotExists = async (req: Request, res: Response, next: NextFuncti
 /**
  * Checks that collection with given title and owner Id does exist (req.params)
  */
+const collectionIdExists = async (req: Request, res: Response, next: NextFunction) => {
+  const collection = await CollectionCollection.findOne(req.params.collectionId);
+  if (!collection) {
+    res.status(403).json({
+      error: {
+        freetNotFound: 'Collection does not exist.'
+      }
+    });
+    return;
+  }
+
+  next();
+};
+
+/**
+ * Checks that collection with given title and owner Id does exist (req.params)
+ */
 const collectionExists = async (req: Request, res: Response, next: NextFunction) => {
   const collection = await CollectionCollection.findCollection(req.params.title, req.session.userId);
   if (!collection) {
@@ -93,6 +110,7 @@ const freetInCollection = async (req: Request, res: Response, next: NextFunction
 
 export {
   collectionNotExists,
+  collectionIdExists,
   collectionExists,
   freetNotInCollection,
   freetInCollection

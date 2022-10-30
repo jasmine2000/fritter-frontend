@@ -3,6 +3,7 @@ import type {Freet} from './model';
 import FreetModel from './model';
 import UserCollection from '../user/collection';
 import LikeCollection from '../like/collection';
+import CollectionCollection from '../collection/collection';
 
 /**
  * This files contains a class that has the functionality to explore freets
@@ -63,6 +64,23 @@ class FreetCollection {
   static async findAllByUsername(username: string): Promise<Array<HydratedDocument<Freet>>> {
     const author = await UserCollection.findOneByUsername(username);
     return FreetModel.find({authorId: author._id}).sort({dateModified: -1}).populate(['authorId', 'likes']);
+  }
+
+  /**
+   * Get all the freets in given collection
+   *
+   * @param {string} username - The username of author of the freets
+   * @return {Promise<HydratedDocument<Freet>[]>} - An array of all of the freets
+   */
+  static async findByCollection(collectionId: Types.ObjectId | string): Promise<Array<HydratedDocument<Freet>>> {
+    const collection = await CollectionCollection.findOne(collectionId);
+    const collectionFreets = [];
+    for (const freetId of collection.posts) {
+      const freet = FreetModel.findOne(freetId).populate(['authorId', 'likes']);
+      collectionFreets.push(freet);
+    }
+
+    return Promise.all(collectionFreets);
   }
 
   /**

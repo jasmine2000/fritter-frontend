@@ -2,6 +2,7 @@ import type {NextFunction, Request, Response} from 'express';
 import express from 'express';
 import FreetCollection from './collection';
 import * as userValidator from '../user/middleware';
+import * as collectionValidator from '../collection/middleware';
 import * as freetValidator from '../freet/middleware';
 import * as util from './util';
 
@@ -18,7 +19,7 @@ const router = express.Router();
 /**
  * Get freets by author.
  *
- * @name GET /api/freets?author=username
+ * @name GET /api/freets?username=username
  *
  * @return {FreetResponse[]} - An array of freets created by user with username, author
  * @throws {400} - If author is not given
@@ -44,6 +45,26 @@ router.get(
   async (req: Request, res: Response) => {
     const authorFreets = await FreetCollection.findAllByUsername(req.query.username as string);
     const response = authorFreets.map(util.constructFreetResponse);
+    res.status(200).json(response);
+  }
+);
+
+/**
+ * Get freets in collection
+ *
+ * @name GET /api/freets/collection/:collectionId
+ *
+ * @return {FreetResponse[]} - A list of all the freets sorted in descending
+ *                      order by date modified
+ */
+router.get(
+  '/collection/:collectionId',
+  [
+    collectionValidator.collectionIdExists
+  ],
+  async (req: Request, res: Response) => {
+    const collectionFreets = await FreetCollection.findByCollection(req.params.collectionId);
+    const response = collectionFreets.map(util.constructFreetResponse);
     res.status(200).json(response);
   }
 );
