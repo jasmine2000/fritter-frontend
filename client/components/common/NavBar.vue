@@ -6,9 +6,11 @@
   <nav>
     <div class="left">
       <img src="../../public/logo.svg">
-      <h1 class="title">
-        Fritter
-      </h1>
+      <router-link to="/">
+        <h1 class="title">
+          Fritter
+        </h1>
+      </router-link>
     </div>
     <div class="right">
       <router-link to="/">
