@@ -14,6 +14,12 @@
       <router-link to="/">
         Home
       </router-link>
+      <router-link 
+        v-if="$store.state.username"
+        :to="'/profile/'+$store.state.username"
+      >
+        Profile
+      </router-link>
       <router-link
         v-if="$store.state.username"
         to="/account"
