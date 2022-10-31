@@ -49,6 +49,10 @@ class CollectionCollection {
    */
   static async findOne(collectionId: Types.ObjectId | string): Promise<HydratedDocument<Collection>> {
     const collection = await CollectionModel.findOne({_id: collectionId});
+    if (!collection) {
+      return null;
+    }
+
     await CollectionCollection.filter(collection._id);
     return collection;
   }
@@ -62,6 +66,10 @@ class CollectionCollection {
    */
   static async findCollection(title: string, ownerId: Types.ObjectId | string): Promise<HydratedDocument<Collection>> {
     const collection = await CollectionModel.findOne({title, ownerId});
+    if (!collection) {
+      return null;
+    }
+
     await CollectionCollection.filter(collection._id);
     return collection;
   }

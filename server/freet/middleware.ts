@@ -64,7 +64,7 @@ const isValidEditedFreet = async (req: Request, res: Response, next: NextFunctio
   const freet = await FreetCollection.findOne(req.params.freetId);
   const {originalContent} = freet;
   const numEdits = getMinEdits(originalContent, req.body.content);
-  console.log(numEdits);
+
   if (numEdits >= 10) {
     res.status(413).json({
       error: `${numEdits} character adds/removes/replaces is too many.`

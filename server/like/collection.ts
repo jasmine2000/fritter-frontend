@@ -57,7 +57,6 @@ class LikeCollection {
    * @return {Promise<HydratedDocument<Freet>> | Promise<null> } - The freet with the given freetId, if any
    */
   static async findByPost(postId: Types.ObjectId | string): Promise<Array<HydratedDocument<Like>>> {
-    console.log(postId);
     return LikeModel.find({postId});
   }
 
