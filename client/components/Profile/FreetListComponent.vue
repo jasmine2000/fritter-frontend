@@ -57,14 +57,14 @@ export default {
 
 <style scoped>
 section {
-display: flex;
-flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 header, header > * {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 button {

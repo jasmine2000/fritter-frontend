@@ -49,17 +49,23 @@
 
 <style scoped>
 nav {
-    padding: 1vw 2vw;
-    background-color: #ccc;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
+  padding: 1vw 2vw;
+  background-color:lightskyblue;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  font-family: system-ui;
+  font-weight: bold;
+}
+
+router-link {
+  font-size: larger;
 }
 
 .title {
-    font-size: 32px;
-    margin: 0 5px;
+  font-size: 32px;
+  margin: 0 5px;
 }
 
 img {

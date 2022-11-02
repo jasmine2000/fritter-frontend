@@ -4,7 +4,7 @@
   <article class="profileHeader">
     <span>
       <h2 class="left">
-        {{ username }}
+        @{{ username }}
       </h2>
       <article
         v-if="$store.state.username && username != $store.state.username"
@@ -107,13 +107,15 @@ flex-direction: column;
 }
 
 .profileHeader {
-    border: 1px solid #111;
-    padding: 20px;
-    position: relative;
+  border-bottom: 1px solid #111;
+  padding: 20px;
+  padding-left: 40px;
+  position: relative;
 }
 
-.selected {
-background-color:lightblue
+button {
+  font-weight: bold;
+  font-size: medium;
 }
 </style>
   

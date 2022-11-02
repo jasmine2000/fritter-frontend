@@ -3,38 +3,42 @@
 
 <template>
   <form @submit.prevent="submit">
-    <h3>{{ title }}</h3>
-    <article
-      v-if="fields.length"
-    >
-      <div
-        v-for="field in fields"
-        :key="field.id"
+    <section class="form">
+      <h3>{{ title }}</h3>
+      <article
+        v-if="fields.length"
       >
-        <label :for="field.id">{{ field.label }}:</label>
-        <textarea
-          v-if="field.id === 'content'"
-          :name="field.id"
-          :value="field.value"
-          @input="field.value = $event.target.value"
-        />
-        <input
-          v-else
-          :type="field.id === 'password' ? 'password' : 'text'"
-          :name="field.id"
-          :value="field.value"
-          @input="field.value = $event.target.value"
+        <div
+          v-for="field in fields"
+          :key="field.id"
         >
-      </div>
-    </article>
-    <article v-else>
-      <p>{{ content }}</p>
-    </article>
-    <button
-      type="submit"
-    >
-      {{ title }}
-    </button>
+          <label :for="field.id">{{ field.label }}:</label>
+          <textarea
+            v-if="field.id === 'content'"
+            :name="field.id"
+            :value="field.value"
+            @input="field.value = $event.target.value"
+          />
+          <input
+            v-else
+            :type="field.id === 'password' ? 'password' : 'text'"
+            :name="field.id"
+            :value="field.value"
+            @input="field.value = $event.target.value"
+          >
+        </div>
+      </article>
+      <article v-else>
+        <p>{{ content }}</p>
+      </article>
+    </section>
+    <section class="submitButton">
+      <button
+        type="submit"
+      >
+        {{ title }}
+      </button>
+    </section>
     <section class="alerts">
       <article
         v-for="(status, alert, index) in alerts"
@@ -117,13 +121,32 @@ export default {
 
 <style scoped>
 form {
-  border: 1px solid #111;
-  padding: 0.5rem;
   display: flex;
   flex-direction: column;
+  padding: 15px;
+  padding-left: 25px;
+  padding-right: 25px;
   justify-content: space-between;
   margin-bottom: 14px;
   position: relative;
+  border-radius: 15px;
+  border-style: none;
+  background-color: rgb(219, 240, 253);
+}
+
+.submitButton {
+  display: flex;
+  justify-content: center;
+}
+
+button {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: medium;
+  font-weight: bold;
+  background-color: white;
+  border-radius: 10px;
+  width: 20%;
 }
 
 article > div {
@@ -144,8 +167,14 @@ form h3 {
   margin-top: 0;
 }
 
+p {
+  margin: 0;
+}
+
 textarea {
-   font-family: inherit;
-   font-size: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  border-radius: 15px;
+  margin-top: 5px;
 }
 </style>

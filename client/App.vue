@@ -44,6 +44,21 @@ body {
 
 main {
   padding: 0 5em 5em;
+  font-family: system-ui;
+}
+
+button {
+  border-radius: 5px;
+  padding: 8px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-style: none;
+  margin-right: 5px;
+}
+
+.selected {
+  background-color:lightskyblue;
+  font-weight: bold;
 }
 
 .alerts {

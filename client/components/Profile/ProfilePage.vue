@@ -4,7 +4,7 @@
   <main>
     <section>
       <ProfileHeaderComponent />
-      <section class="wide-buttons">
+      <section class="sections">
         <button
           :class="freetView ? 'selected' : ''"
           @click="freetView=true"
@@ -56,22 +56,26 @@ section {
 }
 
 header, header > * {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 button {
-    margin-right: 10px;
-}
-
-.wide-buttons {
+  flex-direction: column;
+  font-size: large;
   display: flex;
-  align-content: center;
-  width: 50pc;
+  width: 100%;
+  align-items: center;
+  padding: 10px;
+  border-style: none;
+  margin: 5px;
 }
 
-.selected {
-  background-color:lightblue
+.sections {
+  display: flex;
+  flex-direction: row;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 </style>

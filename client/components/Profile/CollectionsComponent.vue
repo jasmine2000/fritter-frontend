@@ -2,24 +2,26 @@
 
 <template>
   <section>
-    <span>
-      <button
-        v-for="collection in userCollections"
-        :key="collection._id.toString()"
-        :class="collection._id == currentCollection ? 'selected' : ''"
-        @click="getCollectionFreets(collection._id.toString())"
-      >
-        {{ collection.title }}
-      </button>
-    </span>
-    <AddCollectionForm
-      ref="addCollectionForm"
-      value=""
-      placeholder="Enter Collection Name"
-      button="Add Collection"
-      @refresh="getCollections"
-    />
-    <section
+    <section class="collectionTitles">
+      <section class="collectionTitlesOnly">
+        <button
+          v-for="collection in userCollections"
+          :key="collection._id.toString()"
+          :class="collection._id == currentCollection ? 'selected' : ''"
+          @click="getCollectionFreets(collection._id.toString())"
+        >
+          {{ collection.title }}
+        </button>
+      </section>
+      <AddCollectionForm
+        ref="addCollectionForm"
+        value=""
+        placeholder="Enter Collection Name"
+        button="Add Collection"
+        @refresh="getCollections"
+      />
+    </section>
+    <article
       v-if="currentCollectionFreets.length"
     >
       <FreetComponent
@@ -27,7 +29,7 @@
         :key="freet.id"
         :freet="freet"
       />
-    </section>
+    </article>
     <article
       v-else
     >
@@ -123,35 +125,40 @@ methods: {
 </script>
 
 <style scoped>
-section {
-display: flex;
-flex-direction: column;
+
+.collectionTitles {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.collectionTitlesOnly {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
 }
 
 header, header > * {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 button {
-    margin-right: 10px;
+  margin-right: 5px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-style: none;
 }
 
 section .scrollbox {
   flex: 1 0 50vh;
   padding: 3%;
   overflow-y: scroll;
-}
-/* 
-form {
-  border: 1px solid #111;
-    padding: 20px;
-    position: relative;
-} */
-
-.selected {
-background-color:lightblue
 }
 </style>
   

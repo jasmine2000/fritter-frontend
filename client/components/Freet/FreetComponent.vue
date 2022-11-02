@@ -14,32 +14,6 @@
           @{{ freet.author }}
         </router-link>
       </h3>
-      <div
-        v-if="$store.state.username === freet.author"
-        class="actions"
-      >
-        <button
-          v-if="editing"
-          @click="submitEdit"
-        >
-          ✅ Save changes
-        </button>
-        <button
-          v-if="editing"
-          @click="stopEditing"
-        >
-          🚫 Discard changes
-        </button>
-        <button
-          v-if="!editing"
-          @click="startEditing"
-        >
-          ✏️ Edit
-        </button>
-        <button @click="deleteFreet">
-          🗑️ Delete
-        </button>
-      </div>
     </header>
     <textarea
       v-if="editing"
@@ -59,6 +33,32 @@
     >
       {{ freet.content }}
     </p>
+    <div
+      v-if="$store.state.username === freet.author"
+      class="actions"
+    >
+      <button
+        v-if="editing"
+        @click="submitEdit"
+      >
+        ✅ Save changes
+      </button>
+      <button
+        v-if="editing"
+        @click="stopEditing"
+      >
+        🚫 Discard changes
+      </button>
+      <button
+        v-if="!editing"
+        @click="startEditing"
+      >
+        ✏️ Edit
+      </button>
+      <button @click="deleteFreet">
+        🗑️ Delete
+      </button>
+    </div>
     <p class="info">
       Posted at {{ freet.dateModified }}
       <i v-if="freet.edited">(edited)</i>
@@ -216,9 +216,18 @@ export default {
 
 <style scoped>
 .freet {
-    border: 1px solid #111;
-    padding: 20px;
+    border-top: 1px solid #111;
+    padding: 25px;
+    padding-top: 10px;
+    
     position: relative;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.info {
+  color:gray;
+  font-size: small;
 }
 
 .goodColor {
