@@ -63,6 +63,37 @@
       Posted at {{ freet.dateModified }}
       <i v-if="freet.edited">(edited)</i>
     </p>
+    <section class="reactions">
+      <button 
+        class="reactionButtons"
+        @click="toggleLikeState"
+      >
+        <p v-if="isLiked">
+          &#128153;	
+          Unlike
+        </p>
+        <p v-else>
+          &#129293;
+          Like
+        </p>
+      </button>
+      <div class="dropup">
+        <button
+          class="reactionButtons"
+          @click="showCollections=!showCollections"
+        >
+          <p>
+            &#128193;
+            Add to Collection
+          </p>
+        </button>
+        <div class="dropup-content">
+          <a href="#">Link 1</a>
+          <a href="#">Link 2</a>
+          <a href="#">Link 3</a>
+        </div>
+      </div>
+    </section>
     <section class="alerts">
       <article
         v-for="(status, alert, index) in alerts"
@@ -90,20 +121,16 @@ export default {
       editing: false, // Whether or not this freet is in edit mode
       draft: this.freet.content, // Potentially-new content for this freet
       alerts: {}, // Displays success/error messages encountered during freet modification
+      isLiked: false,
+      showCollections: false
     };
   },
   computed: {
     characterCount() {
-      // const memo = new Map<string, number>();
       const minEdits = (originalContent, newContent) => {
         if (!originalContent && !newContent) {
           return 0;
         }
-
-        // const key = originalContent.concat('.', newContent);
-        // if (memo.has(key)) {
-        //   return memo.get(key);
-        // }
 
         if (!originalContent || !newContent) {
           return originalContent.length + newContent.length;
@@ -116,13 +143,15 @@ export default {
         const add = minEdits(originalContent, newContent.slice(1));
         const remove = minEdits(originalContent.slice(1), newContent);
         const replace = minEdits(originalContent.slice(1), newContent.slice(1));
-        // memo.set(key, 1 + Math.min(add, remove, replace));
-        // return memo.get(key);
+        
         return 1 + Math.min(add, remove, replace);
       }
 
       return minEdits(this.freet.content, this.draft);
     }
+  },
+  mounted() {
+    this.setLikeState()
   },
   methods: {
     startEditing() {
@@ -209,25 +238,118 @@ export default {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
-    }
+    },
+    setLikeState() {
+      this.isLiked = this.freet.likes.map(obj => obj.userId).includes(this.$store.state.userId);
+    },
+    async toggleLikeState() {
+      let param = "";
+      const options = {
+        headers: {'Content-Type': 'application/json'}
+      };
+      if (this.isLiked) {
+        options.method = "DELETE";
+        param = this.freet._id;
+      } else {
+        options.method = "POST";
+        options.body = JSON.stringify({postId: this.freet._id});
+      }
+
+      try {
+        const r = await fetch(`/api/likes/${param}`, options);
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+
+        this.isLiked = !this.isLiked;
+        this.$store.commit('refreshFreets');
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
   }
 };
 </script>
 
 <style scoped>
 .freet {
-    border-top: 1px solid #111;
-    padding: 25px;
-    padding-top: 10px;
-    
-    position: relative;
-    margin-top: 10px;
-    margin-bottom: 10px;
+  border-top: 1px solid #111;
+  padding: 20px;
+  padding-top: 10px;
+  position: relative;
+  margin-top: 10px;
 }
 
 .info {
   color:gray;
   font-size: small;
+}
+
+.reactions {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;;
+}
+
+.reactionButtons {
+  padding: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 10px;
+  font-size: medium;
+  font-weight: bold;
+  background-color: white;
+  margin-right: 10px;
+}
+
+/* Dropup Button */
+.dropbtn {
+  background-color: #3498DB;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+}
+
+/* The container <div> - needed to position the dropup content */
+.dropup {
+  display: inline-block;
+  position: relative;
+}
+
+/* Dropup content (Hidden by Default) */
+.dropup-content {
+  display: none;
+  position: absolute;
+  bottom: 50px;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropup */
+.dropup-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropup links on hover */
+.dropup-content a:hover {background-color: #ddd}
+
+/* Show the dropup menu on hover */
+.dropup:hover .dropup-content {
+  display: block;
+}
+
+/* Change the background color of the dropup button when the dropup content is shown */
+.dropup:hover .dropbtn {
+  background-color: #2980B9;
 }
 
 .goodColor {

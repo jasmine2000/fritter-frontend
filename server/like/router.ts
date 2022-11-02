@@ -50,6 +50,31 @@ router.get(
 );
 
 /**
+ * Get "existence" of like
+ *
+ * @name GET /api/likes/:postId
+ *
+ * @return {FreetResponse[]} - An array of likes created by user with username
+ * @throws {400} - If username is not given
+ * @throws {404} - If no user has given username
+ *
+ */
+router.get(
+  '/:postId',
+  [
+    userValidator.isUserLoggedIn,
+    likeValidator.isPostExistsParams
+  ],
+  async (req: Request, res: Response) => {
+    const like = await LikeCollection.findLike(req.params.postId, req.session.userId);
+    res.status(200).json({
+      message: 'Your like was deleted successfully.',
+      exists: like !== null
+    });
+  }
+);
+
+/**
  * Create a like
  *
  * @name POST /api/likes
@@ -65,7 +90,7 @@ router.post(
   '/',
   [
     userValidator.isUserLoggedIn,
-    likeValidator.isPostExists,
+    likeValidator.isPostExistsBody,
     likeValidator.canCreateLike
   ],
   async (req: Request, res: Response) => {
@@ -91,7 +116,7 @@ router.delete(
   '/:postId?',
   [
     userValidator.isUserLoggedIn,
-    likeValidator.isPostExists,
+    likeValidator.isPostExistsParams,
     likeValidator.likeExist
   ],
   async (req: Request, res: Response) => {

@@ -6,10 +6,9 @@ import LikeCollection from './collection';
 /**
  * Makes sure post exists
  */
-const isPostExists = async (req: Request, res: Response, next: NextFunction) => {
-  const validFormat = Types.ObjectId.isValid(req.body.postId);
-  const post = validFormat ? await FreetCollection.findOne(req.body.postId) : '';
-  if (!post) {
+const isPostExistsBody = async (req: Request, res: Response, next: NextFunction) => {
+  const exists = await isPostExists(req.body.postId);
+  if (!exists) {
     res.status(404).json({
       error: {
         postNotFound: 'Post with given ID does not exist.'
@@ -19,6 +18,29 @@ const isPostExists = async (req: Request, res: Response, next: NextFunction) => 
   }
 
   next();
+};
+
+/**
+ * Makes sure post exists
+ */
+const isPostExistsParams = async (req: Request, res: Response, next: NextFunction) => {
+  const exists = await isPostExists(req.params.postId);
+  if (!exists) {
+    res.status(404).json({
+      error: {
+        postNotFound: 'Post with given ID does not exist.'
+      }
+    });
+    return;
+  }
+
+  next();
+};
+
+const isPostExists = async (postId: string): Promise<boolean> => {
+  const validFormat = Types.ObjectId.isValid(postId);
+  const post = validFormat ? await FreetCollection.findOne(postId) : '';
+  return post !== null;
 };
 
 /**
@@ -56,7 +78,8 @@ const likeExist = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export {
-  isPostExists,
+  isPostExistsBody,
+  isPostExistsParams,
   canCreateLike,
   likeExist
 };
