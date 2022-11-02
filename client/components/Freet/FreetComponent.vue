@@ -80,7 +80,6 @@
       <div class="dropup">
         <button
           class="reactionButtons"
-          @click="showCollections=!showCollections"
         >
           <p>
             &#128193;
@@ -88,9 +87,14 @@
           </p>
         </button>
         <div class="dropup-content">
-          <a href="#">Link 1</a>
-          <a href="#">Link 2</a>
-          <a href="#">Link 3</a>
+          <a
+            v-for="collection in filteredCollections"
+            :key="collection._id.toString()"
+            @click="toggleCollectionMembership(collection)"
+          >
+            <div v-if="collection.hasFreet">&#10004;{{ collection.title }}</div>
+            <div v-else>{{ collection.title }}</div>
+          </a>
         </div>
       </div>
     </section>
@@ -122,7 +126,7 @@ export default {
       draft: this.freet.content, // Potentially-new content for this freet
       alerts: {}, // Displays success/error messages encountered during freet modification
       isLiked: false,
-      showCollections: false
+      filteredCollections: []
     };
   },
   computed: {
@@ -151,7 +155,7 @@ export default {
     }
   },
   mounted() {
-    this.setLikeState()
+    this.setReactionState()
   },
   methods: {
     startEditing() {
@@ -239,8 +243,22 @@ export default {
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
     },
-    setLikeState() {
+    setReactionState() {
+      // set like state
       this.isLiked = this.freet.likes.map(obj => obj.userId).includes(this.$store.state.userId);
+      // set which collections freet is in
+      for (const collection of this.$store.state.userCollections) {
+        if (collection.title == "Likes") continue;
+        var hasFreet = false;
+        for (const postId of collection.posts) {
+          if (postId == this.freet._id) {
+            hasFreet = true;
+            break;
+          }
+        }
+        const newCollection = {_id: collection._id, title: collection.title, hasFreet};
+        this.filteredCollections.push(newCollection);
+      }
     },
     async toggleLikeState() {
       let param = "";
@@ -264,6 +282,54 @@ export default {
 
         this.isLiked = !this.isLiked;
         this.$store.commit('refreshFreets');
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
+    async addFreetToCollection(collectionTitle) {
+      const options = {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({freetId: this.freet._id})
+      };
+
+      try {
+        const r = await fetch(`/api/collections/${collectionTitle}`, options);
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        
+        const message = `Added to ${collectionTitle}!`
+        this.$set(this.alerts, message, 'success');
+        setTimeout(() => this.$delete(this.alerts, message), 3000);
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
+    async toggleCollectionMembership(collection) {
+      const options = {
+        method: collection.hasFreet ? 'DELETE' : 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({freetId: this.freet._id})
+      };
+
+      try {
+        const r = await fetch(`/api/collections/${collection.title}`, options);
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error);
+        }
+        
+        const message = collection.hasFreet ? `Removed From ${collection.title}` : `Added to ${collection.title}`;
+        this.$set(this.alerts, message, 'success');
+        setTimeout(() => this.$delete(this.alerts, message), 3000);
+
+        collection.hasFreet = !collection.hasFreet;
 
       } catch (e) {
         this.$set(this.alerts, e, 'error');

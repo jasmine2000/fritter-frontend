@@ -58,7 +58,7 @@ router.post(
 /**
  * Add Freet to Collection
  *
- * @name PUT /api/collections/:collection
+ * @name PUT /api/collections/:title
  *
  * @param {string} freetId - the freetId to add
  * @return {CollectionResponse} - the updated collection
@@ -85,7 +85,7 @@ router.put(
 /**
  * Delete Collection
  *
- * @name DELETE /api/collections/:collection
+ * @name DELETE /api/collections/:title
  *
  * @return {CollectionResponse} - the updated collection
  * @throws {403} - if the user is not logged in or does not own collection with name
@@ -93,7 +93,7 @@ router.put(
 /**
  * Remove Freet from Collection
  *
- * @name DELETE /api/collections/:collection
+ * @name DELETE /api/collections/:title
  *
  * @param {string} freetId - the freetId to remove
  * @return {CollectionResponse} - the updated collection

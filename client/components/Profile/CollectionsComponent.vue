@@ -18,7 +18,7 @@
         value=""
         placeholder="Enter Collection Name"
         button="Add Collection"
-        @refresh="getCollections"
+        @refresh="$store.commit('refreshCollections')"
       />
     </section>
     <article
@@ -49,7 +49,7 @@ data() {
     return {
     username: this.$route.params.username,
     userCollections: [],
-    currentCollection: 0,
+    currentCollection: null,
     currentCollectionFreets: []
     };
 },
@@ -58,9 +58,9 @@ mounted() {
 },
 methods: {
   async getCollections() {
-  /**
-   * Gets given user's collections
-   */
+    /**
+     * Gets given user's collections
+     */
     try {
       const r = await fetch(`/api/collections?username=${this.username}`);
       const res = await r.json();
@@ -69,10 +69,7 @@ methods: {
       }
 
       this.userCollections = res;
-      if (!this.currentCollection) {
-        this.currentCollection = this.userCollections[0]._id.toString();
-      }
-      this.getCollectionFreets(this.currentCollection);
+      this.getCollectionFreets(this.currentCollection ? this.currentCollection : this.userCollections[0]._id.toString());
 
     } catch (e) {
         this.$set(this.alerts, e, 'error');
@@ -103,17 +100,28 @@ methods: {
     /**
      * Gets freets in given collection
      */
+    await this.collectionRequest('POST', collectionName);
+  },
+  async deleteCollection(collectionName) {
+    /**
+     * Gets freets in given collection
+     */
+    await this.collectionRequest('DELETE', collectionName);
+  },
+  async collectionRequest(method, collectionName) {
+    /**
+     * Gets freets in given collection
+     */
      const options = {
-        method: 'POST', headers: {'Content-Type': 'application/json'}
+        method: method, headers: {'Content-Type': 'application/json'}
       };
     try {
       const r = await fetch(`/api/collection/${collectionName}`, options);
+      const res = await r.json();
       if (!r.ok) {
         throw new Error(res.error);
       }
-      
-      const res = await r.json();
-      this.userCollections.push(res);
+      this.$store.commit('refreshCollections');
 
     } catch (e) {
         this.$set(this.alerts, e, 'error');

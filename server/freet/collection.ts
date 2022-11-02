@@ -95,7 +95,7 @@ class FreetCollection {
     freet.content = content;
     freet.dateModified = new Date();
     await freet.save();
-    return freet.populate('authorId');
+    return freet.populate('authorId', 'likes');
   }
 
   /**
