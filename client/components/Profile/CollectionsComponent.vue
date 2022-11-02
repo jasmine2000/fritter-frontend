@@ -1,8 +1,13 @@
 <!-- Default page that also displays freets -->
 
 <template>
-  <section>
+  <section v-if="isEditing">
     <section class="collectionTitles">
+      <button
+        @click="getCollectionFreets(collection._id.toString())"
+      >
+        Save Changes
+      </button>
       <section class="collectionTitlesOnly">
         <button
           v-for="collection in userCollections"
@@ -20,6 +25,20 @@
         button="Add Collection"
         @refresh="$store.commit('refreshCollections')"
       />
+    </section>
+  </section>
+  <section v-else>
+    <section class="collectionTitles">
+      <section class="collectionTitlesOnly">
+        <button
+          v-for="collection in userCollections"
+          :key="collection._id.toString()"
+          :class="collection._id == currentCollection ? 'selected' : ''"
+          @click="getCollectionFreets(collection._id.toString())"
+        >
+          {{ collection.title }}
+        </button>
+      </section>
     </section>
     <article
       v-if="currentCollectionFreets.length"
@@ -46,12 +65,13 @@ export default {
 name: 'CollectionsComponent',
 components: {FreetComponent, AddCollectionForm},
 data() {
-    return {
+  return {
     username: this.$route.params.username,
     userCollections: [],
     currentCollection: null,
-    currentCollectionFreets: []
-    };
+    currentCollectionFreets: [],
+    isEditing: true
+  };
 },
 mounted() {
   this.getCollections();
