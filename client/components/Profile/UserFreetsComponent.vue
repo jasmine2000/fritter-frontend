@@ -21,12 +21,14 @@
 import FreetComponent from '@/components/Freet/FreetComponent.vue';
 
 export default {
-  name: 'ProfilePage',
+  name: 'UserFreetsComponent',
   components: {FreetComponent},
+  props: {
+    username: {type: String, required: true}
+  },
   data() {
     return {
-    username: this.$route.params.username,
-    userFreets: [],
+      userFreets: [],
     };
   },
   mounted() {

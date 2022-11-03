@@ -65,6 +65,7 @@
     <ReactionComponent 
       v-if="$store.state.username != null"
       :freet="freet"
+      @refreshContent="$emit('refreshContent')"
     />
     <section class="alerts">
       <article
@@ -122,7 +123,7 @@ export default {
         return 1 + Math.min(add, remove, replace);
       }
 
-      return minEdits(this.freet.content, this.draft);
+      return minEdits(this.freet.originalContent, this.draft);
     }
   },
   mounted() {

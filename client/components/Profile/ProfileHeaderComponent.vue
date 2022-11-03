@@ -32,9 +32,12 @@
 export default {
   name: 'ProfileHeaderComponent',
   components: {},
+  props: {
+    username: {type: String, required: true}
+  },
   data() {
     return {
-        username: this.$route.params.username,
+        // username: this.$route.params.username,
         isFollowing: false,
     };
   },

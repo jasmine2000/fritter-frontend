@@ -3,7 +3,9 @@
 <template>
   <main>
     <section>
-      <ProfileHeaderComponent />
+      <ProfileHeaderComponent
+        :username="$route.params.username"
+      />
       <section class="sections">
         <button
           :class="freetView ? 'selected' : ''"
@@ -21,25 +23,29 @@
       <section
         v-if="freetView"
       >
-        <FreetListComponent />
+        <UserFreetsComponent
+          :username="$route.params.username"
+        />
       </section>
       <section
         v-else
       >
-        <CollectionsComponent />
+        <UserCollectionsComponent
+          :username="$route.params.username"
+        />
       </section>
     </section>
   </main>
 </template>
 
 <script>
-import FreetListComponent from '@/components/Profile/FreetListComponent.vue';
-import CollectionsComponent from '@/components/Profile/CollectionsComponent.vue';
+import UserFreetsComponent from '@/components/Profile/UserFreetsComponent.vue';
+import UserCollectionsComponent from '@/components/Profile/UserCollectionsComponent.vue';
 import ProfileHeaderComponent from '@/components/Profile/ProfileHeaderComponent.vue';
 
 export default {
   name: 'ProfilePage',
-  components: {FreetListComponent, CollectionsComponent, ProfileHeaderComponent},
+  components: {UserFreetsComponent, UserCollectionsComponent, ProfileHeaderComponent},
   data() {
     return {
       username: this.$route.params.username,

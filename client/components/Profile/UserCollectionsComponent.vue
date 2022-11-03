@@ -58,6 +58,7 @@
         v-for="freet in currentCollectionFreets"
         :key="freet.id"
         :freet="freet"
+        @refreshContent="getCollectionFreets(currentCollection)"
       />
     </article>
     <article
@@ -75,9 +76,11 @@ import AddCollectionForm from '@/components/Profile/AddCollectionForm.vue';
 export default {
 name: 'CollectionsComponent',
 components: {FreetComponent, AddCollectionForm},
+props: {
+  username: {type: String, required: true}
+  },
 data() {
   return {
-    username: this.$route.params.username,
     userCollections: [],
     currentCollection: null,
     currentCollectionFreets: [],

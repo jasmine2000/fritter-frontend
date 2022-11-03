@@ -106,30 +106,7 @@ methods: {
         }
 
         this.isLiked = !this.isLiked;
-        this.$store.commit('refreshFreets');
-
-    } catch (e) {
-        this.$set(this.alerts, e, 'error');
-        setTimeout(() => this.$delete(this.alerts, e), 3000);
-    }
-  },
-  async addFreetToCollection(collectionTitle) {
-    const options = {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({freetId: this.freet._id})
-    };
-
-    try {
-        const r = await fetch(`/api/collections/${collectionTitle}`, options);
-        if (!r.ok) {
-        const res = await r.json();
-        throw new Error(res.error);
-        }
-        
-        const message = `Added to ${collectionTitle}!`
-        this.$set(this.alerts, message, 'success');
-        setTimeout(() => this.$delete(this.alerts, message), 3000);
+        this.$emit('refreshContent');
 
     } catch (e) {
         this.$set(this.alerts, e, 'error');
@@ -156,6 +133,7 @@ methods: {
         setTimeout(() => this.$delete(this.alerts, message), 3000);
 
         collection.hasFreet = !collection.hasFreet;
+        this.$emit('refreshContent');
 
     } catch (e) {
         this.$set(this.alerts, e, 'error');
