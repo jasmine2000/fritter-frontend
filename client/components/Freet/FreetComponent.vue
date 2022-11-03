@@ -8,7 +8,6 @@
     <header>
       <h3 class="author">
         <router-link 
-          v-if="$store.state.username"
           :to="'/profile/'+ freet.author"
         >
           @{{ freet.author }}
@@ -63,41 +62,10 @@
       Posted at {{ freet.dateModified }}
       <i v-if="freet.edited">(edited)</i>
     </p>
-    <section class="reactions">
-      <button 
-        class="reactionButtons"
-        @click="toggleLikeState"
-      >
-        <p v-if="isLiked">
-          &#128153;	
-          Unlike
-        </p>
-        <p v-else>
-          &#129293;
-          Like
-        </p>
-      </button>
-      <div class="dropup">
-        <button
-          class="reactionButtons"
-        >
-          <p>
-            &#128193;
-            Add to Collection
-          </p>
-        </button>
-        <div class="dropup-content">
-          <a
-            v-for="collection in filteredCollections"
-            :key="collection._id.toString()"
-            @click="toggleCollectionMembership(collection)"
-          >
-            <div v-if="collection.hasFreet">&#10004;{{ collection.title }}</div>
-            <div v-else>{{ collection.title }}</div>
-          </a>
-        </div>
-      </div>
-    </section>
+    <ReactionComponent 
+      v-if="$store.state.username != null"
+      :freet="freet"
+    />
     <section class="alerts">
       <article
         v-for="(status, alert, index) in alerts"
@@ -111,8 +79,11 @@
 </template>
 
 <script>
+import ReactionComponent from '@/components/Freet/ReactionComponent.vue'
+
 export default {
   name: 'FreetComponent',
+  components: {ReactionComponent},
   props: {
     // Data from the stored freet
     freet: {
@@ -282,29 +253,6 @@ export default {
 
         this.isLiked = !this.isLiked;
         this.$store.commit('refreshFreets');
-
-      } catch (e) {
-        this.$set(this.alerts, e, 'error');
-        setTimeout(() => this.$delete(this.alerts, e), 3000);
-      }
-    },
-    async addFreetToCollection(collectionTitle) {
-      const options = {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({freetId: this.freet._id})
-      };
-
-      try {
-        const r = await fetch(`/api/collections/${collectionTitle}`, options);
-        if (!r.ok) {
-          const res = await r.json();
-          throw new Error(res.error);
-        }
-        
-        const message = `Added to ${collectionTitle}!`
-        this.$set(this.alerts, message, 'success');
-        setTimeout(() => this.$delete(this.alerts, message), 3000);
 
       } catch (e) {
         this.$set(this.alerts, e, 'error');

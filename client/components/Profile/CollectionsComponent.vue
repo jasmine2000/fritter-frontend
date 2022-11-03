@@ -4,31 +4,42 @@
   <section v-if="isEditing">
     <section class="collectionTitles">
       <button
-        @click="getCollectionFreets(collection._id.toString())"
+        class="editButton"
+        @click="isEditing=false"
       >
-        Save Changes
+        Stop Editing
       </button>
       <section class="collectionTitlesOnly">
         <button
           v-for="collection in userCollections"
           :key="collection._id.toString()"
-          :class="collection._id == currentCollection ? 'selected' : ''"
-          @click="getCollectionFreets(collection._id.toString())"
+          :class="'collectionTitlesEditing'"
+          @click="deleteCollection(collection.title, collection._id.toString())"
         >
-          {{ collection.title }}
+          {{ collection.title }} &#10005;
         </button>
       </section>
+      <p>
+        Click a Collection to delete it. Add a new collection below.
+      </p>
       <AddCollectionForm
         ref="addCollectionForm"
         value=""
         placeholder="Enter Collection Name"
         button="Add Collection"
-        @refresh="$store.commit('refreshCollections')"
+        @refresh="getCollections"
       />
     </section>
   </section>
   <section v-else>
     <section class="collectionTitles">
+      <button
+        v-if="username==$store.state.username"
+        class="editButton"
+        @click="isEditing=true"
+      >
+        Edit Collections
+      </button>
       <section class="collectionTitlesOnly">
         <button
           v-for="collection in userCollections"
@@ -70,7 +81,7 @@ data() {
     userCollections: [],
     currentCollection: null,
     currentCollectionFreets: [],
-    isEditing: true
+    isEditing: false
   };
 },
 mounted() {
@@ -116,17 +127,15 @@ methods: {
         setTimeout(() => this.$delete(this.alerts, e), 3000);
     }
   },
-  async createCollection(collectionName) {
-    /**
-     * Gets freets in given collection
-     */
-    await this.collectionRequest('POST', collectionName);
-  },
-  async deleteCollection(collectionName) {
+  async deleteCollection(collectionName, collectionId) {
     /**
      * Gets freets in given collection
      */
     await this.collectionRequest('DELETE', collectionName);
+    if (this.currentCollection == collectionId) {
+      this.currentCollection = this.userCollections[0]._id.toString();
+    }
+    this.$store.commit('refreshCollections');
   },
   async collectionRequest(method, collectionName) {
     /**
@@ -136,12 +145,12 @@ methods: {
         method: method, headers: {'Content-Type': 'application/json'}
       };
     try {
-      const r = await fetch(`/api/collection/${collectionName}`, options);
+      const r = await fetch(`/api/collections/${collectionName}`, options);
       const res = await r.json();
       if (!r.ok) {
         throw new Error(res.error);
       }
-      this.$store.commit('refreshCollections');
+      this.getCollections();
 
     } catch (e) {
         this.$set(this.alerts, e, 'error');
@@ -165,7 +174,21 @@ methods: {
 .collectionTitlesOnly {
   display: flex;
   justify-content: center;
+}
+
+.collectionTitlesEditing {
+  /* display: flex;
+  justify-content: center; */
+  background-color: tomato;
+}
+
+.editButton {
   margin-bottom: 10px;
+  font-weight: bold;
+}
+
+p {
+  font-size: small;
 }
 
 header, header > * {

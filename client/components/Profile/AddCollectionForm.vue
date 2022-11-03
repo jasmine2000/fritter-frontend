@@ -32,6 +32,8 @@ export default {
 
         this.$emit('refresh', true);
         this.value = "";
+
+        this.$store.commit('refreshCollections');
   
       } catch (e) {
         this.$set(this.alerts, e, 'error');
