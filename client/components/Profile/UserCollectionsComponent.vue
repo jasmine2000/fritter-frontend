@@ -8,7 +8,7 @@
         class="editButton"
         @click="isEditing=false"
       >
-        Stop Editing
+        <u>Stop Editing</u>
       </button>
       <small class="instruction">
         Click a Collection to delete it. Add a new collection below.
@@ -39,7 +39,7 @@
         class="editButton"
         @click="isEditing=true"
       >
-        Edit Collections
+        <u>Edit Collections</u>
       </button>
       <section class="collectionTitlesOnly">
         <button

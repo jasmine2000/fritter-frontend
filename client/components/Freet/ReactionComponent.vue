@@ -20,7 +20,7 @@
         >
           <p>
             &#128193;
-            Add to Collection
+            Collections
           </p>
         </button>
         <div class="dropup-content">
