@@ -31,6 +31,11 @@ export default {
       userFreets: [],
     };
   },
+  watch: {
+    username: function() {
+      this.getFreets();
+    }
+  },
   mounted() {
     this.getFreets();
   },

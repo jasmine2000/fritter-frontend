@@ -51,7 +51,12 @@ export default {
       username: this.$route.params.username,
       freetView: true,
     };
-  }
+  },
+  watch: {
+    $route: function() {
+      this.freetView = true;
+    }
+  },
 };
 </script>
 

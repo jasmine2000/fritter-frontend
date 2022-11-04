@@ -4,11 +4,15 @@
   <section v-if="isEditing">
     <section class="collectionTitles">
       <button
+        v-if="username==$store.state.username"
         class="editButton"
         @click="isEditing=false"
       >
         Stop Editing
       </button>
+      <small class="instruction">
+        Click a Collection to delete it. Add a new collection below.
+      </small>
       <section class="collectionTitlesOnly">
         <button
           v-for="collection in userCollections"
@@ -19,9 +23,6 @@
           {{ collection.title }} &#10005;
         </button>
       </section>
-      <p>
-        Click a Collection to delete it. Add a new collection below.
-      </p>
       <AddCollectionForm
         ref="addCollectionForm"
         value=""
@@ -78,7 +79,7 @@ name: 'CollectionsComponent',
 components: {FreetComponent, AddCollectionForm},
 props: {
   username: {type: String, required: true}
-  },
+},
 data() {
   return {
     userCollections: [],
@@ -86,6 +87,12 @@ data() {
     currentCollectionFreets: [],
     isEditing: false
   };
+},
+watch: {
+  username: function() {
+    this.currentCollection = null;
+    this.getCollections();
+  }
 },
 mounted() {
   this.getCollections();
@@ -172,6 +179,7 @@ methods: {
   justify-content: center;
   align-items: center;
   margin-bottom: 20px;
+  margin-top: 0px;
 }
 
 .collectionTitlesOnly {
@@ -180,14 +188,21 @@ methods: {
 }
 
 .collectionTitlesEditing {
-  /* display: flex;
-  justify-content: center; */
   background-color: tomato;
+  margin-bottom: 10px;
 }
 
 .editButton {
-  margin-bottom: 10px;
+  background-color: white;
+  font-size: small;
   font-weight: bold;
+  padding: 5px;
+  align-self: flex-end;
+}
+
+.instruction {
+  align-self: center;
+  margin-bottom: 15px;
 }
 
 p {
