@@ -5,34 +5,97 @@
     <section>
       <ProfileHeaderComponent
         :username="$route.params.username"
+        :view="followView"
+        :following="following"
+        :followers="followers"
+        @setView="(b) => followView=b"
+        @refreshFollowStats="refreshFollowStats"
       />
-      <section class="sections">
-        <button
-          :class="freetView ? 'selected' : ''"
-          @click="freetView=true"
-        >
-          View Freets
-        </button>
-        <button
-          :class="!freetView ? 'selected' : ''"
-          @click="freetView=false"
-        >
-          View Collections
-        </button>
-      </section>
       <section
-        v-if="freetView"
+        v-if="followView"
       >
-        <UserFreetsComponent
-          :username="$route.params.username"
-        />
+        <section 
+          class="sections"
+        >
+          <button
+            :class="viewFollowers ? 'selected' : ''"
+            @click="viewFollowers=true"
+          >
+            Followers
+          </button>
+          <button
+            :class="!viewFollowers ? 'selected' : ''"
+            @click="viewFollowers=false"
+          >
+            Following
+          </button>
+        </section>
+        <section
+          class="userList"
+        >
+          <div
+            v-if="viewFollowers"
+          >
+            <h3 
+              v-for="user in followers"
+              :key="user._id"
+            >
+              <router-link 
+                :to="'/profile/'+ user.username"
+              >
+                @{{ user.username }}
+              </router-link>
+            </h3>
+          </div>
+          <div
+            v-else
+          >
+            <h3 
+              v-for="user in following"
+              :key="user._id"
+            >
+              <router-link 
+                :to="'/profile/'+ user.username"
+              >
+                @{{ user.username }}
+              </router-link>
+            </h3>
+          </div>
+        </section>
       </section>
       <section
         v-else
       >
-        <UserCollectionsComponent
-          :username="$route.params.username"
-        />
+        <section 
+          class="sections"
+        >
+          <button
+            :class="freetView ? 'selected' : ''"
+            @click="freetView=true"
+          >
+            View Freets
+          </button>
+          <button
+            :class="!freetView ? 'selected' : ''"
+            @click="freetView=false"
+          >
+            View Collections
+          </button>
+        </section>
+        <section
+          v-if="freetView"
+        >
+          <UserFreetsComponent
+            :username="$route.params.username"
+          />
+        </section>
+        <section
+          v-else
+        >
+          <UserCollectionsComponent
+            :username="$route.params.username"
+          />
+        </section>
       </section>
     </section>
   </main>
@@ -50,6 +113,10 @@ export default {
     return {
       username: this.$route.params.username,
       freetView: true,
+      followView: false,
+      viewFollowers: true,
+      following: null,
+      followers: null,
     };
   },
   watch: {
@@ -57,6 +124,50 @@ export default {
       this.freetView = true;
     }
   },
+  mounted() {
+    this.getFollowers();
+    this.getFollowing();
+  },
+  methods: {
+    async refreshFollowStats() {
+      this.getFollowers();
+    },
+    async getFollowing() {
+      /**
+       * Get the people the user is following
+       */
+      try {
+        const r = await fetch(`/api/users/${this.username}/following`);
+        const res = await r.json();
+        if (!r.ok) {
+          throw new Error(res.error);
+        }
+        this.following = res.following;
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
+    async getFollowers() {
+      /**
+       * Get the followers of the user
+       */
+      try {
+        const r = await fetch(`/api/users/${this.username}/followers`);
+        const res = await r.json();
+        if (!r.ok) {
+          throw new Error(res.error);
+        }
+        
+        this.followers = res.followers;
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
+  }
 };
 </script>
 
@@ -81,6 +192,21 @@ button {
   padding: 10px;
   border-style: none;
   margin: 5px;
+}
+
+.backButtonContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.backButton {
+  background-color: white;
+  width: 20%;
+}
+
+.userList {
+  margin-left: 50px
 }
 
 .sections {

@@ -65,6 +65,30 @@ class UserCollection {
   }
 
   /**
+   * Find a all user ids that username is following
+   *
+   * @param {string} username - The username to get all following for
+   * @return {Promise<HydratedDocument<User>[]>} - The newly created follow
+   */
+  static async findFollowing(username: string): Promise<Array<HydratedDocument<User>>> {
+    const following = await FollowCollection.findFollowing(username);
+    const followUsers = Promise.all(following.map(async follow => UserModel.findOne({_id: follow.followedId})));
+    return followUsers;
+  }
+
+  /**
+   * Find a all user ids that username is following
+   *
+   * @param {string} username - The username to get all following for
+   * @return {Promise<HydratedDocument<Follow>[]>} - The newly created follow
+   */
+  static async findFollowers(username: string): Promise<Array<HydratedDocument<User>>> {
+    const followers = await FollowCollection.findFollowers(username);
+    const followUsers = Promise.all(followers.map(async follow => UserModel.findOne({_id: follow.followerId})));
+    return followUsers;
+  }
+
+  /**
    * Update user's information
    *
    * @param {string} userId - The userId of the user to update

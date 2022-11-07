@@ -2,12 +2,13 @@
 
 <template>
   <article class="profileHeader">
-    <span>
+    <div class="name">
       <h2 class="left">
         @{{ username }}
       </h2>
       <article
         v-if="$store.state.username && username != $store.state.username"
+        class="followButton"
       >
         <button
           v-if="isFollowing"
@@ -23,7 +24,21 @@
           Follow
         </button>
       </article>
-    </span>
+    </div>
+    <button 
+      v-if="!view"
+      class="followStats"
+      @click="$emit('setView', true)"
+    >
+      {{ followers.length }} Followers | {{ following.length }} Following
+    </button>
+    <button 
+      v-else
+      class="followStats"
+      @click="$emit('setView', false)"
+    >
+      &#8592; Back to Freets
+    </button>
   </article>
 </template>
   
@@ -33,19 +48,25 @@ export default {
   name: 'ProfileHeaderComponent',
   components: {},
   props: {
-    username: {type: String, required: true}
+    username: {type: String, required: true},
+    view: {type: Boolean, required: true},
+    followers: {type: Object, required: true},
+    following: {type: Object, required: true}
   },
   data() {
     return {
-        // username: this.$route.params.username,
         isFollowing: false,
+        // followers: null,
+        // following: null,
     };
   },
   mounted() {
-    this.getState();
+    this.getIsFollowing();
+    this.getFollowing();
+    this.getFollowers();
   },
   methods: {
-    async getState() {
+    async getIsFollowing() {
       /**
        * See if user is following this user
        */
@@ -55,7 +76,6 @@ export default {
         if (!r.ok) {
           throw new Error(res.error);
         }
-        
         this.isFollowing = res.isFollowing;
 
       } catch (e) {
@@ -63,12 +83,48 @@ export default {
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
     },
+    // async getFollowing() {
+    //   /**
+    //    * Get the people the user is following
+    //    */
+    //   try {
+    //     const r = await fetch(`/api/users/${this.username}/following`);
+    //     const res = await r.json();
+    //     if (!r.ok) {
+    //       throw new Error(res.error);
+    //     }
+    //     this.following = res.following;
+
+    //   } catch (e) {
+    //     this.$set(this.alerts, e, 'error');
+    //     setTimeout(() => this.$delete(this.alerts, e), 3000);
+    //   }
+    // },
+    // async getFollowers() {
+    //   /**
+    //    * Get the followers of the user
+    //    */
+    //   try {
+    //     const r = await fetch(`/api/users/${this.username}/followers`);
+    //     const res = await r.json();
+    //     if (!r.ok) {
+    //       throw new Error(res.error);
+    //     }
+        
+    //     this.followers = res.followers;
+
+    //   } catch (e) {
+    //     this.$set(this.alerts, e, 'error');
+    //     setTimeout(() => this.$delete(this.alerts, e), 3000);
+    //   }
+    // },
     async follow() {
       /**
        * follow user
        */
       this.request({method: 'POST'});
       this.isFollowing = true;
+      this.$emit('refreshFollowStats');
     },
     async unfollow() {
       /**
@@ -76,6 +132,7 @@ export default {
        */
       this.request({method: 'DELETE'});
       this.isFollowing = false;
+      this.$emit('refreshFollowStats');
     },
     async request(params) {
       /**
@@ -109,6 +166,11 @@ display: flex;
 flex-direction: column;
 }
 
+.followButton {
+  margin-left: 20px;
+  font-weight: bold;
+  font-size: medium;
+}
 .profileHeader {
   border-bottom: 1px solid #111;
   padding: 20px;
@@ -116,9 +178,13 @@ flex-direction: column;
   position: relative;
 }
 
-button {
-  font-weight: bold;
-  font-size: medium;
+.name {
+  display: flex;
+  align-items: center;
+}
+
+.followStats {
+  background-color: white;
 }
 </style>
   

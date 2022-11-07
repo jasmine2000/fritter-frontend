@@ -19,7 +19,7 @@ const router = express.Router();
 /**
  * Get freets by author.
  *
- * @name GET /api/freets?username=username
+ * @name GET /api/freets?username=username&following=true
  *
  * @return {FreetResponse[]} - An array of freets created by user with username, author
  * @throws {400} - If author is not given
@@ -43,9 +43,15 @@ router.get(
     userValidator.isUserExists
   ],
   async (req: Request, res: Response) => {
-    const authorFreets = await FreetCollection.findAllByUsername(req.query.username as string);
-    const response = authorFreets.map(util.constructFreetResponse);
-    res.status(200).json(response);
+    if (req.query.following === undefined) {
+      const authorFreets = await FreetCollection.findAllByUsername(req.query.username as string);
+      const response = authorFreets.map(util.constructFreetResponse);
+      res.status(200).json(response);
+    } else if (req.query.following === 'true') {
+      const followingFreets = await FreetCollection.findByFollowers(req.query.username as string);
+      const response = followingFreets.map(util.constructFreetResponse);
+      res.status(200).json(response);
+    }
   }
 );
 

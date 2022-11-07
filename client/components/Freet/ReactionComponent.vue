@@ -124,7 +124,6 @@ methods: {
         const r = await fetch(`/api/collections/${collection.title}`, options);
         if (!r.ok) {
             const res = await r.json();
-            console.log(res.error);
             throw new Error(res.error);
         }
         

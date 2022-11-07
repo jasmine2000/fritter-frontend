@@ -4,6 +4,7 @@ import FreetModel from './model';
 import UserCollection from '../user/collection';
 import LikeCollection from '../like/collection';
 import CollectionCollection from '../collection/collection';
+import FollowCollection from '../follow/collection';
 
 /**
  * This files contains a class that has the functionality to explore freets
@@ -64,6 +65,18 @@ class FreetCollection {
   static async findAllByUsername(username: string): Promise<Array<HydratedDocument<Freet>>> {
     const author = await UserCollection.findOneByUsername(username);
     return FreetModel.find({authorId: author._id}).sort({dateModified: -1}).populate(['authorId', 'likes']);
+  }
+
+  /**
+   * Get all the freets in by given author
+   *
+   * @param {string} username - The username of author of the freets
+   * @return {Promise<HydratedDocument<Freet>[]>} - An array of all of the freets
+   */
+  static async findByFollowers(username: string): Promise<Array<HydratedDocument<Freet>>> {
+    const following = await FollowCollection.findFollowing(username);
+    const followingIds = following.map(follow => follow.followedId);
+    return FreetModel.find({authorId: {$in: followingIds}}).sort({dateModified: -1}).populate(['authorId', 'likes']);
   }
 
   /**

@@ -16,6 +16,9 @@
       <router-link to="/">
         Home
       </router-link>
+      <router-link to="/search">
+        Search
+      </router-link>
       <router-link 
         v-if="$store.state.username"
         :to="'/profile/'+$store.state.username"

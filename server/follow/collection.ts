@@ -1,5 +1,5 @@
 import type {HydratedDocument, Types} from 'mongoose';
-import UserCollection from 'server/user/collection';
+import UserCollection from '../user/collection';
 import type {Follow} from './model';
 import FollowModel from './model';
 
@@ -47,6 +47,28 @@ class FollowCollection {
    */
   static async findFollow(followerId: Types.ObjectId | string, followedId: Types.ObjectId | string): Promise<HydratedDocument<Follow>> {
     return FollowModel.findOne({followerId, followedId});
+  }
+
+  /**
+   * Find a all user ids that username is following
+   *
+   * @param {string} username - The username to get all following for
+   * @return {Promise<HydratedDocument<Follow>[]>} - The newly created follow
+   */
+  static async findFollowing(username: string): Promise<Array<HydratedDocument<Follow>>> {
+    const user = await UserCollection.findOneByUsername(username);
+    return FollowModel.find({_id: {$in: user.following}});
+  }
+
+  /**
+   * Find a all user ids that username is following
+   *
+   * @param {string} username - The username to get all following for
+   * @return {Promise<HydratedDocument<Follow>[]>} - The newly created follow
+   */
+  static async findFollowers(username: string): Promise<Array<HydratedDocument<Follow>>> {
+    const user = await UserCollection.findOneByUsername(username);
+    return FollowModel.find({_id: {$in: user.followers}});
   }
 
   /**

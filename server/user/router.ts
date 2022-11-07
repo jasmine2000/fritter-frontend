@@ -3,6 +3,7 @@ import express from 'express';
 import FreetCollection from '../freet/collection';
 import UserCollection from './collection';
 import * as userValidator from '../user/middleware';
+import * as followValidator from '../follow/middleware';
 import * as util from './util';
 
 const router = express.Router();
@@ -82,6 +83,54 @@ router.delete(
     req.session.userId = undefined;
     res.status(200).json({
       message: 'You have been logged out successfully.'
+    });
+  }
+);
+
+/**
+ * Get following
+ *
+ * @name GET /api/users/:username/following
+ *
+ * @param {string} username - username to look up
+ * @return {FollowResponse} - The created like
+ * @throws {404} - If the other user does not exist
+ *
+ */
+router.get(
+  '/:username/following',
+  [
+    followValidator.followedExists
+  ],
+  async (req: Request, res: Response) => {
+    const following = await UserCollection.findFollowing(req.params.username);
+    res.status(200).json({
+      message: 'Found following',
+      following: following.map(util.constructUserResponse)
+    });
+  }
+);
+
+/**
+ * Get followers
+ *
+ * @name GET /api/users/:username/followers
+ *
+ * @param {string} userId - user to follow
+ * @return {FollowResponse} - The created like
+ * @throws {404} - If the other user does not exist
+ *
+ */
+router.get(
+  '/:username/followers',
+  [
+    followValidator.followedExists
+  ],
+  async (req: Request, res: Response) => {
+    const followers = await UserCollection.findFollowers(req.params.username);
+    res.status(200).json({
+      message: 'Found followers',
+      followers: followers.map(util.constructUserResponse)
     });
   }
 );

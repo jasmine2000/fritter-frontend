@@ -30,7 +30,7 @@ export default {
           throw new Error(res.error);
         }
 
-        this.$emit('refresh', true);
+        this.$emit('refresh');
         this.value = "";
 
         this.$store.commit('refreshCollections');

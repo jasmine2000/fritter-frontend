@@ -23,7 +23,8 @@ const router = express.Router();
 router.get(
   '/:username',
   [
-    userValidator.isUserLoggedIn
+    userValidator.isUserLoggedIn,
+    followValidator.followedExists
   ],
   async (req: Request, res: Response) => {
     const followed = await UserCollection.findOneByUsername(req.params.username);
@@ -31,6 +32,54 @@ router.get(
     res.status(200).json({
       message: 'Found follow',
       isFollowing: follow !== null
+    });
+  }
+);
+
+/**
+ * Get following
+ *
+ * @name GET /api/follow/:username/following
+ *
+ * @param {string} username - username to look up
+ * @return {FollowResponse} - The created like
+ * @throws {404} - If the other user does not exist
+ *
+ */
+router.get(
+  '/:username/following',
+  [
+    followValidator.followedExists
+  ],
+  async (req: Request, res: Response) => {
+    const following = await FollowCollection.findFollowing(req.params.username);
+    res.status(200).json({
+      message: 'Found following',
+      following: following.map(util.constructFollowResponse)
+    });
+  }
+);
+
+/**
+ * Get followers
+ *
+ * @name GET /api/follow/:username/followers
+ *
+ * @param {string} userId - user to follow
+ * @return {FollowResponse} - The created like
+ * @throws {404} - If the other user does not exist
+ *
+ */
+router.get(
+  '/:username/followers',
+  [
+    followValidator.followedExists
+  ],
+  async (req: Request, res: Response) => {
+    const following = await FollowCollection.findFollowers(req.params.username);
+    res.status(200).json({
+      message: 'Found followers',
+      followers: following.map(util.constructFollowResponse)
     });
   }
 );
