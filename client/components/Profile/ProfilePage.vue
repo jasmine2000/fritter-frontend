@@ -5,27 +5,60 @@
     <section>
       <ProfileHeaderComponent
         :username="$route.params.username"
-        :view="followView"
-        :following="following"
-        :followers="followers"
-        @setView="(b) => followView=b"
-        @refreshFollowStats="refreshFollowStats"
+        :view="freet_follow"
+        :following="following.length"
+        :followers="followers.length"
+        @toggleView="freet_follow=!freet_follow"
       />
       <section
-        v-if="followView"
+        v-if="freet_follow"
       >
         <section 
           class="sections"
         >
           <button
-            :class="viewFollowers ? 'selected' : ''"
-            @click="viewFollowers=true"
+            :class="author_collection ? 'selected' : ''"
+            @click="author_collection=true"
+          >
+            View Freets
+          </button>
+          <button
+            :class="!author_collection ? 'selected' : ''"
+            @click="author_collection=false"
+          >
+            View Collections
+          </button>
+        </section>
+        <section
+          v-if="author_collection"
+        >
+          <UserFreetsComponent
+            :username="$route.params.username"
+          />
+        </section>
+        <section
+          v-else
+        >
+          <UserCollectionsComponent
+            :username="$route.params.username"
+          />
+        </section>
+      </section>
+      <section
+        v-else
+      >
+        <section 
+          class="sections"
+        >
+          <button
+            :class="followers_following ? 'selected' : ''"
+            @click="followers_following=true"
           >
             Followers
           </button>
           <button
-            :class="!viewFollowers ? 'selected' : ''"
-            @click="viewFollowers=false"
+            :class="!followers_following ? 'selected' : ''"
+            @click="followers_following=false"
           >
             Following
           </button>
@@ -34,7 +67,7 @@
           class="userList"
         >
           <div
-            v-if="viewFollowers"
+            v-if="followers_following"
           >
             <h3 
               v-for="user in followers"
@@ -63,40 +96,6 @@
           </div>
         </section>
       </section>
-      <section
-        v-else
-      >
-        <section 
-          class="sections"
-        >
-          <button
-            :class="freetView ? 'selected' : ''"
-            @click="freetView=true"
-          >
-            View Freets
-          </button>
-          <button
-            :class="!freetView ? 'selected' : ''"
-            @click="freetView=false"
-          >
-            View Collections
-          </button>
-        </section>
-        <section
-          v-if="freetView"
-        >
-          <UserFreetsComponent
-            :username="$route.params.username"
-          />
-        </section>
-        <section
-          v-else
-        >
-          <UserCollectionsComponent
-            :username="$route.params.username"
-          />
-        </section>
-      </section>
     </section>
   </main>
 </template>
@@ -112,16 +111,20 @@ export default {
   data() {
     return {
       username: this.$route.params.username,
-      freetView: true,
-      followView: false,
-      viewFollowers: true,
-      following: null,
-      followers: null,
+      freet_follow: true,
+      author_collection: true,
+      followers_following: true,
+      following: [],
+      followers: [],
     };
   },
   watch: {
     $route: function() {
-      this.freetView = true;
+      this.freet_follow = true;
+      this.author_collection = true;
+      this.followers_following = true;
+      this.getFollowers();
+      this.getFollowing();
     }
   },
   mounted() {
@@ -129,9 +132,6 @@ export default {
     this.getFollowing();
   },
   methods: {
-    async refreshFollowStats() {
-      this.getFollowers();
-    },
     async getFollowing() {
       /**
        * Get the people the user is following

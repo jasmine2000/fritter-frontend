@@ -48,7 +48,7 @@ router.get(
       const response = authorFreets.map(util.constructFreetResponse);
       res.status(200).json(response);
     } else if (req.query.following === 'true') {
-      const followingFreets = await FreetCollection.findByFollowers(req.query.username as string);
+      const followingFreets = await FreetCollection.findByFollowing(req.query.username as string);
       const response = followingFreets.map(util.constructFreetResponse);
       res.status(200).json(response);
     }

@@ -26,16 +26,16 @@
       </article>
     </div>
     <button 
-      v-if="!view"
+      v-if="view"
       class="followStats"
-      @click="$emit('setView', true)"
+      @click="$emit('toggleView')"
     >
-      {{ followers.length }} Followers | {{ following.length }} Following
+      {{ followers + followerDiff }} Followers | {{ following }} Following
     </button>
     <button 
       v-else
       class="followStats"
-      @click="$emit('setView', false)"
+      @click="$emit('toggleView')"
     >
       &#8592; Back to Freets
     </button>
@@ -50,22 +50,29 @@ export default {
   props: {
     username: {type: String, required: true},
     view: {type: Boolean, required: true},
-    followers: {type: Object, required: true},
-    following: {type: Object, required: true}
   },
   data() {
     return {
         isFollowing: false,
-        // followers: null,
-        // following: null,
+        followerDiff: 0,
+        followers: 0,
+        following: 0
     };
   },
+  watch: {
+    username: function() {
+      this.getFollowData();
+    }
+  },
   mounted() {
-    this.getIsFollowing();
-    this.getFollowing();
-    this.getFollowers();
+    this.getFollowData();
   },
   methods: {
+    async getFollowData() {
+      this.getIsFollowing();
+      this.getFollowingCount();
+      this.getFollowerCount();
+    },
     async getIsFollowing() {
       /**
        * See if user is following this user
@@ -83,48 +90,48 @@ export default {
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
     },
-    // async getFollowing() {
-    //   /**
-    //    * Get the people the user is following
-    //    */
-    //   try {
-    //     const r = await fetch(`/api/users/${this.username}/following`);
-    //     const res = await r.json();
-    //     if (!r.ok) {
-    //       throw new Error(res.error);
-    //     }
-    //     this.following = res.following;
+    async getFollowingCount() {
+      /**
+       * Get the people the user is following
+       */
+      try {
+        const r = await fetch(`/api/users/${this.username}/following`);
+        const res = await r.json();
+        if (!r.ok) {
+          throw new Error(res.error);
+        }
+        this.following = res.following.length;
 
-    //   } catch (e) {
-    //     this.$set(this.alerts, e, 'error');
-    //     setTimeout(() => this.$delete(this.alerts, e), 3000);
-    //   }
-    // },
-    // async getFollowers() {
-    //   /**
-    //    * Get the followers of the user
-    //    */
-    //   try {
-    //     const r = await fetch(`/api/users/${this.username}/followers`);
-    //     const res = await r.json();
-    //     if (!r.ok) {
-    //       throw new Error(res.error);
-    //     }
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
+    async getFollowerCount() {
+      /**
+       * Get the followers of the user
+       */
+      try {
+        const r = await fetch(`/api/users/${this.username}/followers`);
+        const res = await r.json();
+        if (!r.ok) {
+          throw new Error(res.error);
+        }
         
-    //     this.followers = res.followers;
+        this.followers = res.followers.length;
 
-    //   } catch (e) {
-    //     this.$set(this.alerts, e, 'error');
-    //     setTimeout(() => this.$delete(this.alerts, e), 3000);
-    //   }
-    // },
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
     async follow() {
       /**
        * follow user
        */
       this.request({method: 'POST'});
       this.isFollowing = true;
-      this.$emit('refreshFollowStats');
+      this.followerDiff += 1;
     },
     async unfollow() {
       /**
@@ -132,7 +139,7 @@ export default {
        */
       this.request({method: 'DELETE'});
       this.isFollowing = false;
-      this.$emit('refreshFollowStats');
+      this.followerDiff -= 1;
     },
     async request(params) {
       /**

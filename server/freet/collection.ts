@@ -57,7 +57,7 @@ class FreetCollection {
   }
 
   /**
-   * Get all the freets in by given author
+   * Get all the freets by given author
    *
    * @param {string} username - The username of author of the freets
    * @return {Promise<HydratedDocument<Freet>[]>} - An array of all of the freets
@@ -68,14 +68,17 @@ class FreetCollection {
   }
 
   /**
-   * Get all the freets in by given author
+   * Get all the freets for everyone the author is following
    *
    * @param {string} username - The username of author of the freets
    * @return {Promise<HydratedDocument<Freet>[]>} - An array of all of the freets
    */
-  static async findByFollowers(username: string): Promise<Array<HydratedDocument<Freet>>> {
+  static async findByFollowing(username: string): Promise<Array<HydratedDocument<Freet>>> {
     const following = await FollowCollection.findFollowing(username);
     const followingIds = following.map(follow => follow.followedId);
+    // Add user's own freets to feed
+    const user = await UserCollection.findOneByUsername(username);
+    followingIds.push(user._id);
     return FreetModel.find({authorId: {$in: followingIds}}).sort({dateModified: -1}).populate(['authorId', 'likes']);
   }
 
