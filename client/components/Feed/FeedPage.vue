@@ -30,10 +30,10 @@
         </div>
       </header>
       <section
-        v-if="freets.length"
+        v-if="$store.state.feedFreets.length"
       >
         <FreetComponent
-          v-for="freet in freets"
+          v-for="freet in $store.state.feedFreets"
           :key="freet.id"
           :freet="freet"
         />
@@ -54,30 +54,8 @@ import CreateFreetForm from '@/components/Freet/CreateFreetForm.vue';
 export default {
   name: 'FreetPage',
   components: {FreetComponent, CreateFreetForm},
-  data() {
-    return {
-      freets: []
-    }
-  },
   mounted() {
-    this.getFreets();
-  },
-  methods: {
-    async getFreets() {
-      if (this.$store.state.username == undefined) return;
-      const url = `/api/freets?username=${this.$store.state.username}&following=true`;
-      try {
-        const r = await fetch(url);
-        const res = await r.json();
-        if (!r.ok) {
-          throw new Error(res.error);
-        }
-        this.freets = res;
-      } catch (e) {
-        this.$set(this.alerts, e, 'error');
-        setTimeout(() => this.$delete(this.alerts, e), 3000);
-      }
-    }
+    this.$store.commit('refreshFeed');
   }
 };
 </script>

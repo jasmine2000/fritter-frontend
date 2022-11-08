@@ -14,7 +14,7 @@
         v-if="freet_follow"
       >
         <section 
-          class="sections"
+          class="categories"
         >
           <button
             :class="author_collection ? 'selected' : ''"
@@ -48,7 +48,7 @@
         v-else
       >
         <section 
-          class="sections"
+          class="categories"
         >
           <button
             :class="followers_following ? 'selected' : ''"
@@ -194,22 +194,11 @@ button {
   margin: 5px;
 }
 
-.backButtonContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-.backButton {
-  background-color: white;
-  width: 20%;
-}
-
 .userList {
   margin-left: 50px
 }
 
-.sections {
+.categories {
   display: flex;
   flex-direction: row;
   margin-top: 15px;

@@ -22,10 +22,10 @@
         </div>
       </header>
       <section
-        v-if="$store.state.freets.length"
+        v-if="$store.state.allFreets.length"
       >
         <FreetComponent
-          v-for="freet in $store.state.freets"
+          v-for="freet in $store.state.allFreets"
           :key="freet.id"
           :freet="freet"
         />
@@ -47,7 +47,6 @@ export default {
   name: 'FreetPage',
   components: {FreetComponent, GetFreetsForm},
   mounted() {
-    this.$store.commit('updateFilter', null);
     this.$refs.getFreetsForm.submit();
   }
 };

@@ -11,7 +11,7 @@ export default {
       url: '/api/users',
       method: 'PATCH',
       hasBody: true,
-      setUsername: true,
+      refreshUserData: true,
       fields: [
         {id: 'username', label: 'Username', value: ''}
       ],

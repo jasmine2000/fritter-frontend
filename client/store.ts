@@ -10,7 +10,8 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     filter: null, // Username to filter shown freets by (null = show all)
-    freets: [], // All freets created in the app
+    allFreets: [], // All freets created in the app
+    feedFreets: [], // Freets in user's feed
     username: null, // Username of the logged in user
     userId: null, // userId of logged in user
     userCollections: [], // collections owned by user
@@ -54,7 +55,7 @@ const store = new Vuex.Store({
        * Update the stored freets to the provided freets.
        * @param freets - Freets to store
        */
-      state.freets = freets;
+      state.allFreets = freets;
     },
     async refreshFreets(state) {
       /**
@@ -62,12 +63,13 @@ const store = new Vuex.Store({
        */
       const url = state.filter ? `/api/users/${state.filter}/freets` : '/api/freets';
       const res = await fetch(url).then(async r => r.json());
-      state.freets = res;
+      state.allFreets = res;
     },
     async refreshCollections(state) {
       /**
        * Gets given user's collections
        */
+      if (state.username == undefined) return;
       try {
         const r = await fetch(`/api/collections?username=${state.username}`);
         const res = await r.json();
@@ -82,6 +84,22 @@ const store = new Vuex.Store({
           setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
     },
+    async refreshFeed(state) {
+      if (state.username == undefined) return;
+      const url = `/api/freets?username=${state.username}&following=true`;
+      try {
+        const r = await fetch(url);
+        const res = await r.json();
+        if (!r.ok) {
+          throw new Error(res.error);
+        }
+        state.feedFreets = res;
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    }
   },
   // Store data across page refreshes, only discard on browser close
   plugins: [createPersistedState()]

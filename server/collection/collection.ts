@@ -38,7 +38,8 @@ class CollectionCollection {
   static async filter(collectionId: Types.ObjectId | string): Promise<void> {
     const collection = await CollectionModel.findOne({_id: collectionId});
     const posts = await Promise.all(collection.posts.map(async postId => FreetCollection.findOne(postId)));
-    collection.posts = posts.filter(post => post).map(post => post._id);
+    collection.posts = posts.filter(post => post !== null).map(post => post._id);
+    await collection.save();
   }
 
   /**

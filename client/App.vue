@@ -21,7 +21,9 @@ export default {
       const user = res.user;
       this.$store.commit('setUsername', user ? user.username : null);
       this.$store.commit('setUserId', user ? user._id : null);
-      if (user) this.$store.commit('refreshCollections');
+      if (user) {
+        this.$store.commit('refreshCollections');
+      }
     });
 
     // Clear alerts on page refresh

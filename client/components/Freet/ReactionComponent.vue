@@ -23,7 +23,10 @@
             Collections
           </p>
         </button>
-        <div class="dropup-content">
+        <div 
+          v-if="filteredCollections.length > 0"
+          class="dropup-content"
+        >
           <a
             v-for="collection in filteredCollections"
             :key="collection._id.toString()"
@@ -32,6 +35,12 @@
             <div v-if="collection.hasFreet">&#10004;{{ collection.title }}</div>
             <div v-else>{{ collection.title }}</div>
           </a>
+        </div>
+        <div 
+          v-else
+          class="dropup-content"
+        >
+          <a href="#"><i>No Collections</i></a>
         </div>
       </div>
     </section>
@@ -145,11 +154,6 @@ methods: {
 
 <style scoped>
 
-.info {
-color:gray;
-font-size: small;
-}
-
 .reactions {
     display: flex;
     justify-content: center;
@@ -165,15 +169,6 @@ font-size: small;
     font-weight: bold;
     background-color: white;
     margin-right: 10px;
-}
-
-/* Dropup Button */
-.dropbtn {
-background-color: #3498DB;
-color: white;
-padding: 16px;
-font-size: 16px;
-border: none;
 }
 
 /* The container <div> - needed to position the dropup content */
@@ -209,9 +204,5 @@ display: block;
 display: block;
 }
 
-/* Change the background color of the dropup button when the dropup content is shown */
-.dropup:hover .dropbtn {
-background-color: #2980B9;
-}
 
 </style>
