@@ -20,12 +20,18 @@
       :value="draft"
       @input="draft = $event.target.value"
     />
-    <p
+    <div
       v-if="editing"
       :class="characterCount <= 10 ? 'goodColor' : 'badColor'"
     >
-      {{ characterCount }} / 10 allowed edits made
-    </p>
+      {{ characterCount }} / 10 allowed edits made 
+      <div class="tooltip">
+        ?
+        <span class="tooltiptext">
+          edits = minimum adds, deletes, or swaps it takes to get from original to edited
+        </span>
+      </div>
+    </div>
     <p
       v-else
       class="content"
@@ -54,7 +60,10 @@
       >
         ✏️ Edit
       </button>
-      <button @click="deleteFreet">
+      <button 
+        v-if="!editing"
+        @click="deleteFreet"
+      >
         🗑️ Delete
       </button>
     </div>
@@ -229,10 +238,44 @@ export default {
 }
 
 .goodColor {
-  color: green
+  color: green;
+  margin-top: 5px;
+  margin-bottom: 10px;
 }
 
 .badColor {
-  color: red
+  color: red;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+/* Tooltip container */
+.tooltip {
+  color: gray;
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  bottom: 100%;
+  margin-left: -20px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 </style>
