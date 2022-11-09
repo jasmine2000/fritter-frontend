@@ -132,6 +132,7 @@ export default {
       this.request({method: 'POST'});
       this.isFollowing = true;
       this.followerDiff += 1;
+      this.$emit('refreshFollowers');
     },
     async unfollow() {
       /**
@@ -140,6 +141,7 @@ export default {
       this.request({method: 'DELETE'});
       this.isFollowing = false;
       this.followerDiff -= 1;
+      this.$emit('refreshFollowers');
     },
     async request(params) {
       /**

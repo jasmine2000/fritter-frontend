@@ -9,6 +9,7 @@
         :following="following.length"
         :followers="followers.length"
         @toggleView="freet_follow=!freet_follow"
+        @refreshFollowers="toggleFollow"
       />
       <section
         v-if="freet_follow"
@@ -71,12 +72,12 @@
           >
             <h3 
               v-for="user in followers"
-              :key="user._id"
+              :key="user.id"
             >
               <router-link 
-                :to="'/profile/'+ user.username"
+                :to="'/profile/'+ user.name"
               >
-                @{{ user.username }}
+                @{{ user.name }}
               </router-link>
             </h3>
           </div>
@@ -85,12 +86,12 @@
           >
             <h3 
               v-for="user in following"
-              :key="user._id"
+              :key="user.id"
             >
               <router-link 
-                :to="'/profile/'+ user.username"
+                :to="'/profile/'+ user.name"
               >
-                @{{ user.username }}
+                @{{ user.name }}
               </router-link>
             </h3>
           </div>
@@ -142,7 +143,8 @@ export default {
         if (!r.ok) {
           throw new Error(res.error);
         }
-        this.following = res.following;
+
+        this.following = res.following.map(user => ({id: user._id.toString(), name: user.username}));
 
       } catch (e) {
         this.$set(this.alerts, e, 'error');
@@ -160,13 +162,21 @@ export default {
           throw new Error(res.error);
         }
         
-        this.followers = res.followers;
+        this.followers = res.followers.map(user => ({id: user._id.toString(), name: user.username}));
 
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
     },
+    toggleFollow () {
+      const userIdString = this.$store.state.userId.toString();
+      if (this.followers.map(user => user.id).includes(userIdString)) {
+        this.followers = this.followers.filter(user => user.id != userIdString);
+      } else {
+        this.followers.push({id: userIdString, name: this.$store.state.username});
+      }
+    }
   }
 };
 </script>
